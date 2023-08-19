@@ -7,7 +7,7 @@ import { parseTypescript } from './parser';
  * @returns {Promise<void>}
  */
 async function main(args: string[]) {
-    const self = await fs.readFile(process.argv[1]).then(x => x.toString());
+    const self = await fs.readFile(args.length ? args[0] : process.argv[1]).then(x => x.toString());
     parseTypescript(self)
 }
 
