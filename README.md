@@ -1,4 +1,5 @@
-pnpm tsx index.tsx parser.ts
+```bash
+#> pnpm tsx index.tsx parser.ts
   Function: jsonSchemaTypeFromKeyword
 {
   "functionName": "jsonSchemaTypeFromKeyword",
@@ -67,3 +68,4 @@ pnpm tsx index.tsx parser.ts
     ]
   }
 }
+```
