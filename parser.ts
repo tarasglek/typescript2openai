@@ -1,11 +1,20 @@
 import * as acorn from "acorn";
 import { tsPlugin } from "acorn-typescript";
 
+/**
+ * Converts a typescript keyword to a JSON schema type
+ * @param value The typescript keyword
+ */
 function jsonSchemaTypeFromKeyword(value: string): string | undefined {
     const match = value.match(/^TS(.*)Keyword$/);
     return match ? match[1].toLowerCase() : undefined;
   }
 
+/**
+ * Generates a JSON schema for function parameters
+ * @param node The AST node for the function
+ * @param paramDescriptions The descriptions for each parameter
+ */
 function generateJsonSchema(node: any, paramDescriptions: any): any {
     const schema: any = { properties: {}, required: [] };
 
@@ -27,6 +36,10 @@ function generateJsonSchema(node: any, paramDescriptions: any): any {
     return schema;
 }
 
+/**
+ * Parses a JSDoc comment and returns the function description and parameter descriptions
+ * @param jsdoc The JSDoc comment to parse
+ */
 function parseJSDoc(jsdoc: string): { funcDescription: string, params: { [key: string]: string } } {
     const funcDescriptionMatch = jsdoc.match(/(?<=\*\s)(.*)/);
     const paramsMatch = jsdoc.match(/@param\s(\w+)\s(.*)/g);
@@ -80,7 +93,6 @@ export function parseTypescript(code: string) {
                 let paramDescriptions = {}
                 if (node.loc && lastLocEnd) {
                     let start = node.loc.start
-                    console.log(start)
                     // print code between lastLocEnd and start
                     let jsdoc = code.substring(lastLocEnd.index, start.index)
                     let parsedJSDoc = parseJSDoc(jsdoc)
