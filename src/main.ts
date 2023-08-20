@@ -1,6 +1,6 @@
 // import async fs
 import * as fs from 'fs/promises';
-import { parseTypescript } from './parser';
+import { parseTypescript } from './index';
 /**
  * main function
  * @param args cmd args

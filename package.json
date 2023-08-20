@@ -2,17 +2,19 @@
   "name": "typescript2openai",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "build": "tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["openai", "jsonschema", "typescript"],
+  "author": "Taras Glek",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.5.1",
     "tsx": "^3.12.7",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^0.34.2"
   },
   "dependencies": {
     "acorn": "^8.10.0",
