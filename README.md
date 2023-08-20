@@ -2,6 +2,13 @@ This is a utility to convert TypeScript/JavaScript function signatures with jsdo
 
 See the unit test for examples of conversions and usage: [basic.test.ts](./src/test/basic.test.ts)
 
+## Usage
+```typescript
+import { parseTypeScript } from "typescript2openai";
+parseTypeScript("function funcWithArrayAndOptionalParam(firstParam: string[], optional?: number) {}");
+```
+
+
 Go from this:
 
 ```typescript
