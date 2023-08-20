@@ -21,6 +21,7 @@ to
   "name": "funcWithArrayAndOptionalParam",
   "description": "Example of a function that takes an array and has an optional parameter",
   "parameters": {
+      "type": "object",
       "properties": {
           "firstParam": {
               "type": {
