@@ -35,3 +35,28 @@ function funcWithArrayAndOptionalParam(firstParam: string[], optional?: number) 
 
 function funcWithArray(s:any, arrayParam: string[]) {
 }
+// TODO: add test for this
+/**
+ * 4. The function itself, must be async. It should accept an Object
+ * matching the schema defined in parameters and should return a Promise
+ * to a string or any other JavaScript object.
+ *
+ * If you return a non-string, it will be displayed as JSON.
+ *
+ * If you return a string, you can format it as a Markdown code block
+ * so that it gets displayed correctly.  For example:
+ *
+ * return "```html
+" + result + "```";
+*/
+export default async function (data) {
+    return data.value;
+}
+
+/**
+* Echo back
+* @param s The text to echo
+*/
+function echo(s:string) {
+    return s;
+}
