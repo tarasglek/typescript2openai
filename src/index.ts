@@ -13,7 +13,10 @@ export interface FunctionParams {
 export interface FunctionSchema {
     name: string;
     description?: string;
-    parameters: FunctionParams
+    parameters: {
+        type: "object",
+        properties: FunctionParams
+    };
 }
 
 /**
@@ -122,6 +125,7 @@ export function parseJSDoc(comment: string): { funcDescription?: string, params:
  * @returns A JSON schema for each function
  */
 export function parseTypescript(code: string): FunctionSchema[] {
+    console.log("new code")
     const ast = acorn.Parser.extend(tsPlugin() as any).parse(code, {
         sourceType: "module",
         ecmaVersion: "latest",
@@ -165,7 +169,10 @@ export function parseTypescript(code: string): FunctionSchema[] {
             let func: FunctionSchema = {
                 name: node_id?.name as string || '',
                 ...(description ? {description: description} : {}),
-                parameters: generateParamJsonSchema(node, paramDescriptions)
+                parameters: {
+                    type: "object",
+                    properties: generateParamJsonSchema(node, paramDescriptions)
+                }
             };
             // (func as any).jsdoc = jsdoc
             retls.push(func)
