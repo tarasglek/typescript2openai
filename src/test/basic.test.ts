@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 import fs from 'fs/promises'
+import path from 'path'
 import { parseJSDoc, parseTypescript } from '..';
 
 test('parse-jsdoc', () => {
@@ -22,7 +23,8 @@ test('parse-jsdoc', () => {
 })
 
 test('parse-ts', async () => {
-    const self = await fs.readFile('sample_typescript.ts').then(x => x.toString());
+    // sample_typescript.ts is in same dir as this test file
+    const self = await fs.readFile(path.join(__dirname, 'sample_typescript.ts')).then(x => x.toString());
     const funcs = parseTypescript(self)
 
     function findFunc(name: string, log = false) {
@@ -82,7 +84,7 @@ test('parse-ts', async () => {
         "description": "exported function"
     })
 
-    expect(findFunc('noTypesOrJSDoc', true)).toEqual({
+    expect(findFunc('noTypesOrJSDoc')).toEqual({
         "name": "noTypesOrJSDoc",
         "parameters": {
             "properties": {
@@ -96,15 +98,22 @@ test('parse-ts', async () => {
         }
     })
 
-    expect(findFunc("funcWithOptionalParam")).toEqual({
-        "name": "funcWithOptionalParam",
+    expect(findFunc("funcWithArrayAndOptionalParam", true)).toEqual({
+        "name": "funcWithArrayAndOptionalParam",
+        "description": "Example of a function that takes an array and has an optional parameter",
         "parameters": {
             "properties": {
                 "firstParam": {
-                    "type": "string"
+                    "type": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "optional": {
-                    "type": "number"
+                    "type": "number",
+                    "description": "This one does not show up in required"
                 }
             },
             "required": [
@@ -112,6 +121,7 @@ test('parse-ts', async () => {
             ]
         }
     })
+
     expect(findFunc("funcWithArray")).toEqual({
         "name": "funcWithArray",
         "parameters": {

@@ -24,8 +24,14 @@ function basicFunc(jsdoc: string): { funcDescription: string, params: { [key: st
 export function exportedFunc(jsdoc: string) {
 }
 
-function funcWithOptionalParam(firstParam: string, optional?: number) {
+/**
+ * Example of a function that takes an array and has an optional parameter
+ * @param Marvel at how verbose these are to write manually
+ * @param optional This one does not show up in required
+ */
+function funcWithArrayAndOptionalParam(firstParam: string[], optional?: number) {
 }
+
 
 function funcWithArray(s:string, arrayParam: string[]) {
 }
