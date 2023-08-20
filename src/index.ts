@@ -4,15 +4,15 @@ import { tsPlugin } from "acorn-typescript";
 export interface FunctionParams {
     properties: {
         [key: string]: {
-            type: string;
-            description: string;
+            type: ParamType;
+            description?: string;
         };
     };
-    required: string[];
+    required?: string[];
 }
 export interface FunctionSchema {
-    name: string | undefined;
-    description: string | undefined;
+    name: string;
+    description?: string;
     parameters: FunctionParams
 }
 
@@ -20,10 +20,16 @@ export interface FunctionSchema {
  * Converts a typescript keyword to a JSON schema type
  * @param value The typescript keyword
  */
-function jsonSchemaTypeFromKeyword(value: string): string | undefined {
+function jsonSchemaTypeFromKeyword(value: string): string {
     const match = value.match(/^TS(.*)Keyword$/);
-    return match ? match[1].toLowerCase() : undefined;
+    return match ? match[1].toLowerCase() : value;
 }
+
+
+/**
+ * Is either a simple string like "number" or a more complex type { type: "array", items: { type: "number" } }
+ */
+type ParamType = string | { type: string, items: { type: ParamType } };
 
 /**
  * Generates a JSON schema for function parameters
@@ -31,20 +37,28 @@ function jsonSchemaTypeFromKeyword(value: string): string | undefined {
  * @param paramDescriptions The descriptions for each parameter
  */
 function generateParamJsonSchema(node: any, paramDescriptions: any): FunctionParams {
-    const schema: any = { properties: {}, required: [] };
+    const schema: any = { properties: {} };
 
-    function getType(typeNode: any): any {
+    function getType(typeNode: any): ParamType {
         if (typeNode.type === 'TSArrayType') {
-            return getType(typeNode.elementType) + '[]';
+            return {
+                "type": "array",
+                "items": {
+                    "type": getType(typeNode.elementType)
+                }
+            }
         } else {
             return jsonSchemaTypeFromKeyword(typeNode.type);
         }
     }
 
     node.params.forEach((param: any) => {
-        let type = param.typeAnnotation ? getType(param.typeAnnotation.typeAnnotation) : 'any';
+        let type = param.typeAnnotation ? getType(param.typeAnnotation.typeAnnotation) : 'object';
         schema.properties[param.name] = { type, description: paramDescriptions[param.name] };
         if (!param.optional) {
+            if (!schema.required) {
+                schema.required = [];
+            }
             schema.required.push(param.name);
         }
     });
@@ -55,24 +69,45 @@ function generateParamJsonSchema(node: any, paramDescriptions: any): FunctionPar
  * Parses a JSDoc comment and returns the function description and parameter descriptions
  * @param jsdoc The JSDoc comment to parse
  */
-function parseJSDoc(jsdoc: string): { funcDescription: string, params: { [key: string]: string } } {
-    const funcDescriptionMatch = jsdoc.match(/(?<=\*\s)(.*)/);
-    const paramsMatch = jsdoc.match(/@param\s(\w+)\s(.*)/g);
+export function parseJSDoc(comment: string): { funcDescription?: string, params: { [key: string]: string } } {
+    const matches = comment.match(/\/\*\*([\s\S]*?)\*\//g);
+    if (!matches) {
+        return { funcDescription: undefined, params: {} };
+    }
 
+    const lastMatch = matches.pop();
+    if (!lastMatch) {
+        return { funcDescription: undefined, params: {} };
+    }
+
+    const commentContent = lastMatch.match(/\/\*\*([\s\S]*?)\*\//);
+    if (!commentContent || commentContent.length < 2) {
+        return { funcDescription: undefined, params: {} };
+    }
+
+    const lines = commentContent[1].split('\n');
     let funcDescription = '';
-    if (funcDescriptionMatch) {
-        funcDescription = funcDescriptionMatch[0].trim();
-    }
-
     let params: { [key: string]: string } = {};
-    if (paramsMatch) {
-        paramsMatch.forEach(param => {
-            const splitParam = param.split(' ');
-            params[splitParam[1]] = splitParam.slice(2).join(' ');
-        });
+
+    for (let line of lines) {
+        line = line.trim();
+        if (line.startsWith('*')) {
+            line = line.slice(1).trim();
+            if (line.startsWith('@param')) {
+                const paramParts = line.split(' ');
+                const paramName = paramParts[1];
+                const paramDescription = paramParts.slice(2).join(' ');
+                params[paramName] = paramDescription;
+            } else {
+                funcDescription += line + '\n';
+            }
+        }
     }
 
-    return { funcDescription, params };
+    return {
+        funcDescription: funcDescription.trim(),
+        params: params
+    };
 }
 
 /**
@@ -104,35 +139,36 @@ export function parseTypescript(code: string): FunctionSchema[] {
         let abortWalk = false;
         if (node.type === "FunctionDeclaration" ||
             (node.type === "ExportNamedDeclaration" &&
-            (node as any).declaration.type === "FunctionDeclaration")) {
+                (node as any).declaration.type === "FunctionDeclaration")) {
             if (node.type === "ExportNamedDeclaration") {
                 node = (node as any).declaration;
             }
+            const node_loc_start = (node.loc?.start as any).index
             let description = undefined
             let paramDescriptions = {}
             let jsdoc = ''
-            if (node.loc && lastLocEnd) {
-                let start = node.loc.start
+            const node_id = (node as any).id
+            if (node_loc_start !== undefined) {
                 // print code between lastLocEnd and start
-                jsdoc = code.substring(lastLocEnd, (start as any).index)
+                jsdoc = code.substring(lastLocEnd, node_loc_start)
                 let parsedJSDoc = parseJSDoc(jsdoc)
-                // console.log(jsdoc)
-                // console.log((jsdoc))
                 description = parsedJSDoc.funcDescription
                 paramDescriptions = parsedJSDoc.params
             }
             //   console.log(spaces + "FunctionDeclaration", node);
-            const node_id = (node as any).id
             let func: FunctionSchema = {
-                name: node_id?.name as string | undefined,
-                description: description || '',
+                name: node_id?.name as string || '',
                 parameters: generateParamJsonSchema(node, paramDescriptions)
             };
-            (func as any).jsdoc = jsdoc
+            if (description) {
+                func.description = description;
+            }
+            // (func as any).jsdoc = jsdoc
             retls.push(func)
             abortWalk = true;
         }
-        if (node.loc && node.loc.end) {
+        if (node.loc && node.loc.end && node.type !== "Program") {
+            // console.log(node.type, node.loc.end)
             lastLocEnd = (node.loc.end as any).index
         }
         return abortWalk;
