@@ -6,8 +6,8 @@
     /* Language and Environment */
 
     /* Modules */
-    "module": "commonjs",                                /* Specify what module code is generated. */
-
+    "module": "ESNext",                                /* Specify what module code is generated. */
+    "moduleResolution":"nodenext",
     /* JavaScript Support */
 
     /* Emit */
@@ -21,7 +21,7 @@
 
     /* Completeness */
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
-    "target": "ES2018",
+    "target": "esnext",
     "declaration": true,
     "outDir": "./dist",
   },

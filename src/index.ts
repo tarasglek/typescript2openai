@@ -43,8 +43,11 @@ type ParamType = undefined | string | { type: string, items: { type: ParamType }
  * @param node The AST node for the function
  * @param paramDescriptions The descriptions for each parameter
  */
-function generateParamJsonSchema(node: any, paramDescriptions: any): FunctionParams {
-    const schema: any = { properties: {} };
+function generateParamJsonSchema(node: any, paramDescriptions: any) {
+    const schema: any = {
+        type: "object",
+        properties: {} as { [key: string]: any }
+    };
 
     function getType(typeNode: any): ParamType {
         if (typeNode.type === 'TSArrayType') {
@@ -125,7 +128,6 @@ export function parseJSDoc(comment: string): { funcDescription?: string, params:
  * @returns A JSON schema for each function
  */
 export function parseTypescript(code: string): FunctionSchema[] {
-    console.log("new code")
     const ast = acorn.Parser.extend(tsPlugin() as any).parse(code, {
         sourceType: "module",
         ecmaVersion: "latest",
@@ -169,10 +171,8 @@ export function parseTypescript(code: string): FunctionSchema[] {
             let func: FunctionSchema = {
                 name: node_id?.name as string || '',
                 ...(description ? {description: description} : {}),
-                parameters: {
-                    type: "object",
-                    properties: generateParamJsonSchema(node, paramDescriptions)
-                }
+                parameters: generateParamJsonSchema(node, paramDescriptions) as any
+
             };
             // (func as any).jsdoc = jsdoc
             retls.push(func)

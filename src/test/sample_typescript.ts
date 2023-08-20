@@ -33,7 +33,7 @@ function funcWithArrayAndOptionalParam(firstParam: string[], optional?: number) 
 }
 
 
-function funcWithArray(s:any, arrayParam: string[]) {
+function funcWithArray(s: any, arrayParam: string[]) {
 }
 // TODO: add test for this
 /**
@@ -57,6 +57,17 @@ export default async function (data) {
 * Echo back
 * @param s The text to echo
 */
-function echo(s:string) {
+function echo(s: string) {
     return s;
+}
+/**
+ * This function executes clickhouse queries
+ * @param value Valid Clickhouse SQL query
+ */
+function runClickhouseQuery(value: string) {
+    console.log(value)
+    return fetch("https://play.clickhouse.com/?user=play", {
+        method: "POST",
+        body: `${value} FORMAT Markdown`,
+    }).then(x => x.text());
 }
