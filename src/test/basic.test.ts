@@ -39,6 +39,7 @@ test('parse-ts', async () => {
     expect(findFunc('firstFunc')).toEqual({
         "name": "firstFunc",
         "parameters": {
+            "type": "object",
             "properties": {
                 "jsdoc": {
                     "type": "string",
@@ -55,6 +56,7 @@ test('parse-ts', async () => {
     expect(findFunc('basicFunc')).toEqual({
         "name": "basicFunc",
         "parameters": {
+            "type": "object",
             "properties": {
                 "jsdoc": {
                     "type": "string",
@@ -71,6 +73,7 @@ test('parse-ts', async () => {
     expect(findFunc('exportedFunc')).toEqual({
         "name": "exportedFunc",
         "parameters": {
+            "type": "object",
             "properties": {
                 "jsdoc": {
                     "type": "string",
@@ -87,6 +90,7 @@ test('parse-ts', async () => {
     expect(findFunc('noTypesOrJSDoc')).toEqual({
         "name": "noTypesOrJSDoc",
         "parameters": {
+            "type": "object",
             "properties": {
                 "_param": {}
             },
@@ -100,6 +104,7 @@ test('parse-ts', async () => {
         "name": "funcWithArrayAndOptionalParam",
         "description": "Example of a function that takes an array and has an optional parameter",
         "parameters": {
+            "type": "object",
             "properties": {
                 "firstParam": {
                     "type": {
@@ -123,6 +128,7 @@ test('parse-ts', async () => {
     expect(findFunc("funcWithArray")).toEqual({
         "name": "funcWithArray",
         "parameters": {
+            "type": "object",
             "properties": {
                 "s": {},
                 "arrayParam": {
