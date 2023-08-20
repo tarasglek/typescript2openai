@@ -1,6 +1,21 @@
 import * as acorn from "acorn";
 import { tsPlugin } from "acorn-typescript";
 
+export interface FunctionParams {
+    properties: {
+        [key: string]: {
+            type: string;
+            description: string;
+        };
+    };
+    required: string[];
+}
+export interface FunctionSchema {
+    name: string | undefined;
+    description: string | undefined;
+    parameters: FunctionParams
+}
+
 /**
  * Converts a typescript keyword to a JSON schema type
  * @param value The typescript keyword
@@ -8,14 +23,14 @@ import { tsPlugin } from "acorn-typescript";
 function jsonSchemaTypeFromKeyword(value: string): string | undefined {
     const match = value.match(/^TS(.*)Keyword$/);
     return match ? match[1].toLowerCase() : undefined;
-  }
+}
 
 /**
  * Generates a JSON schema for function parameters
  * @param node The AST node for the function
  * @param paramDescriptions The descriptions for each parameter
  */
-function generateJsonSchema(node: any, paramDescriptions: any): any {
+function generateParamJsonSchema(node: any, paramDescriptions: any): FunctionParams {
     const schema: any = { properties: {}, required: [] };
 
     function getType(typeNode: any): any {
@@ -65,7 +80,7 @@ function parseJSDoc(jsdoc: string): { funcDescription: string, params: { [key: s
  * @param code The typescript code to parse
  * @returns A JSON schema for each function
  */
-export function parseTypescript(code: string) {
+export function parseTypescript(code: string): FunctionSchema[] {
     const ast = acorn.Parser.extend(tsPlugin() as any).parse(code, {
         sourceType: "module",
         ecmaVersion: "latest",
@@ -83,8 +98,8 @@ export function parseTypescript(code: string) {
             }
         }
     }
-    let lastLocEnd: any = undefined
-
+    let lastLocEnd = 0
+    let retls: FunctionSchema[] = []
     walk(ast, (node: acorn.Node, depth: number) => {
         const spaces = " ".repeat(depth);
         switch (node.type) {
@@ -94,7 +109,7 @@ export function parseTypescript(code: string) {
                 if (node.loc && lastLocEnd) {
                     let start = node.loc.start
                     // print code between lastLocEnd and start
-                    let jsdoc = code.substring(lastLocEnd.index, start.index)
+                    let jsdoc = code.substring(lastLocEnd, (start as any).index)
                     let parsedJSDoc = parseJSDoc(jsdoc)
                     // console.log(jsdoc)
                     // console.log((jsdoc))
@@ -102,19 +117,19 @@ export function parseTypescript(code: string) {
                     paramDescriptions = parsedJSDoc.params
                 }
                 //   console.log(spaces + "FunctionDeclaration", node);
-                console.log(`${spaces}Function: ${node.id.name}`);
-                let func = {
-                    functionName: node.id.name,
-                    description: description,
-                    params: generateJsonSchema(node, paramDescriptions)
+                const node_id = (node as any).id
+                let func: FunctionSchema = {
+                    name: node_id?.name as string | undefined,
+                    description: description || '',
+                    parameters: generateParamJsonSchema(node, paramDescriptions)
                 }
-                console.log(`${JSON.stringify(func, null, 2)}`);
-                // process.exit(0)
+                retls.push(func)
                 return true
             default:
                 if (node.loc && node.loc.end)
-                    lastLocEnd = node.loc.end
-                // console.log(spaces, JSON.stringify([node.type, node.loc]));
+                    lastLocEnd = (node.loc.end as any).index
+            // console.log(spaces, JSON.stringify([node.type, node.loc]));
         }
     });
+    return retls
 }
