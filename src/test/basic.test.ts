@@ -24,8 +24,8 @@ test('parse-jsdoc', () => {
 
 test('parse-ts', async () => {
     // sample_typescript.ts is in same dir as this test file
-    const self = await fs.readFile(path.join(__dirname, 'sample_typescript.ts')).then(x => x.toString());
-    const funcs = parseTypescript(self)
+    const ts_file = await fs.readFile(path.join(__dirname, 'sample_typescript.ts')).then(x => x.toString());
+    const funcs = parseTypescript(ts_file)
 
     function findFunc(name: string, log = false) {
         let ret = funcs.find(x => x.name == name)
@@ -88,9 +88,7 @@ test('parse-ts', async () => {
         "name": "noTypesOrJSDoc",
         "parameters": {
             "properties": {
-                "_param": {
-                    "type": "object"
-                }
+                "_param": {}
             },
             "required": [
                 "_param"
@@ -126,9 +124,7 @@ test('parse-ts', async () => {
         "name": "funcWithArray",
         "parameters": {
             "properties": {
-                "s": {
-                    "type": "string"
-                },
+                "s": {},
                 "arrayParam": {
                     "type": {
                         "type": "array",

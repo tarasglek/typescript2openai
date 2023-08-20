@@ -4,7 +4,7 @@ import { tsPlugin } from "acorn-typescript";
 export interface FunctionParams {
     properties: {
         [key: string]: {
-            type: ParamType;
+            type?: ParamType;
             description?: string;
         };
     };
@@ -20,16 +20,20 @@ export interface FunctionSchema {
  * Converts a typescript keyword to a JSON schema type
  * @param value The typescript keyword
  */
-function jsonSchemaTypeFromKeyword(value: string): string {
+function jsonSchemaTypeFromKeyword(value: string): string | undefined {
     const match = value.match(/^TS(.*)Keyword$/);
-    return match ? match[1].toLowerCase() : value;
+    let ts_type = match ? match[1].toLowerCase() : value;
+    if (ts_type === 'any') {
+        return undefined;
+    }
+    return ts_type;
 }
 
 
 /**
  * Is either a simple string like "number" or a more complex type { type: "array", items: { type: "number" } }
  */
-type ParamType = string | { type: string, items: { type: ParamType } };
+type ParamType = undefined | string | { type: string, items: { type: ParamType } };
 
 /**
  * Generates a JSON schema for function parameters
@@ -53,8 +57,10 @@ function generateParamJsonSchema(node: any, paramDescriptions: any): FunctionPar
     }
 
     node.params.forEach((param: any) => {
-        let type = param.typeAnnotation ? getType(param.typeAnnotation.typeAnnotation) : 'object';
-        schema.properties[param.name] = { type, description: paramDescriptions[param.name] };
+        let param_type = param.typeAnnotation ? getType(param.typeAnnotation.typeAnnotation) : undefined;
+        let param_description = paramDescriptions[param.name]
+        let entry = { ...(param_type ? {type:param_type} : {}), ...(param_description ? {description: param_description} : {}) }
+        schema.properties[param.name] = entry;
         if (!param.optional) {
             if (!schema.required) {
                 schema.required = [];
@@ -158,11 +164,9 @@ export function parseTypescript(code: string): FunctionSchema[] {
             //   console.log(spaces + "FunctionDeclaration", node);
             let func: FunctionSchema = {
                 name: node_id?.name as string || '',
+                ...(description ? {description: description} : {}),
                 parameters: generateParamJsonSchema(node, paramDescriptions)
             };
-            if (description) {
-                func.description = description;
-            }
             // (func as any).jsdoc = jsdoc
             retls.push(func)
             abortWalk = true;

@@ -33,5 +33,5 @@ function funcWithArrayAndOptionalParam(firstParam: string[], optional?: number) 
 }
 
 
-function funcWithArray(s:string, arrayParam: string[]) {
+function funcWithArray(s:any, arrayParam: string[]) {
 }
