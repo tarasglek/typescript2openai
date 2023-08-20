@@ -55,24 +55,8 @@ function generateParamJsonSchema(node: any, paramDescriptions: any): FunctionPar
  * Parses a JSDoc comment and returns the function description and parameter descriptions
  * @param jsdoc The JSDoc comment to parse
  */
-function parseJSDoc(jsdoc: string): { funcDescription: string, params: { [key: string]: string } } {
-    const funcDescriptionMatch = jsdoc.match(/(?<=\*\s)(.*)/);
-    const paramsMatch = jsdoc.match(/@param\s(\w+)\s(.*)/g);
-
-    let funcDescription = '';
-    if (funcDescriptionMatch) {
-        funcDescription = funcDescriptionMatch[0].trim();
-    }
-
-    let params: { [key: string]: string } = {};
-    if (paramsMatch) {
-        paramsMatch.forEach(param => {
-            const splitParam = param.split(' ');
-            params[splitParam[1]] = splitParam.slice(2).join(' ');
-        });
-    }
-
-    return { funcDescription, params };
+function basicFunc(jsdoc: string): { funcDescription: string, params: { [key: string]: string } } {
+    return {} as any;
 }
 
 /**
