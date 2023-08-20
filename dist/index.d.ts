@@ -39,5 +39,5 @@ export declare function parseJSDoc(comment: string): {
  * @param code The typescript code to parse
  * @returns A JSON schema for each function
  */
-export declare function parseTypescript(code: string): FunctionSchema[];
+export declare function parseTypeScript(code: string): FunctionSchema[];
 export {};

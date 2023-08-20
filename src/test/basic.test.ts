@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 import fs from 'fs/promises'
 import path from 'path'
-import { parseJSDoc, parseTypescript } from '..';
+import { parseJSDoc, parseTypeScript } from '..';
 
 test('parse-jsdoc', () => {
     const comment = `
@@ -25,7 +25,7 @@ test('parse-jsdoc', () => {
 test('parse-ts', async () => {
     // sample_typescript.ts is in same dir as this test file
     const ts_file = await fs.readFile(path.join(__dirname, 'sample_typescript.ts')).then(x => x.toString());
-    const funcs = parseTypescript(ts_file)
+    const funcs = parseTypeScript(ts_file)
 
     function findFunc(name: string, log = false) {
         let ret = funcs.find(x => x.name == name)

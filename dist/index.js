@@ -94,7 +94,7 @@ export function parseJSDoc(comment) {
  * @param code The typescript code to parse
  * @returns A JSON schema for each function
  */
-export function parseTypescript(code) {
+export function parseTypeScript(code) {
     const ast = acorn.Parser.extend(tsPlugin()).parse(code, {
         sourceType: "module",
         ecmaVersion: "latest",

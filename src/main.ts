@@ -1,9 +1,9 @@
 import fs from 'fs/promises'
-import { parseTypescript } from ".";
+import { parseTypeScript } from ".";
 
 async function main(filename: string) {
     const ts_file = await fs.readFile(filename).then(x => x.toString());
-    console.log(JSON.stringify(parseTypescript(ts_file), null, 2))
+    console.log(JSON.stringify(parseTypeScript(ts_file), null, 2))
 }
 
 if (require && require.main === module) {
