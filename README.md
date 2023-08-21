@@ -48,3 +48,6 @@ to
 ```
 
 See the unit test for examples of conversions and usage: [basic.test.ts](./src/test/basic.test.ts)
+
+See also:
+- https://github.dev/vega/ts-json-schema-generator/
