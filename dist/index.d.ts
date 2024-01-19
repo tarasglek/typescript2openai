@@ -1,4 +1,4 @@
-export interface FunctionParams {
+interface FunctionParams {
     properties: {
         [key: string]: {
             type?: ParamType;
@@ -7,7 +7,7 @@ export interface FunctionParams {
     };
     required?: string[];
 }
-export interface FunctionSchema {
+interface FunctionSchema {
     name: string;
     description?: string;
     parameters: {
@@ -28,7 +28,7 @@ type ParamType = undefined | string | {
  * Parses a JSDoc comment and returns the function description and parameter descriptions
  * @param jsdoc The JSDoc comment to parse
  */
-export declare function parseJSDoc(comment: string): {
+declare function parseJSDoc(comment: string): {
     funcDescription?: string;
     params: {
         [key: string]: string;
@@ -39,5 +39,6 @@ export declare function parseJSDoc(comment: string): {
  * @param code The typescript code to parse
  * @returns A JSON schema for each function
  */
-export declare function parseTypeScript(code: string): FunctionSchema[];
-export {};
+declare function parseTypeScript(code: string): FunctionSchema[];
+
+export { type FunctionParams, type FunctionSchema, parseJSDoc, parseTypeScript };
