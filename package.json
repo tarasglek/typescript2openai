@@ -1,6 +1,6 @@
 {
   "name": "typescript2openai",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A utility to convert TypeScript/JavaScript function signatures with jsdoc comments to OpenAI function spec",
   "type": "module",
   "exports": {
