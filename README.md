@@ -1,6 +1,11 @@
 This is a utility to convert TypeScript/JavaScript function signatures with jsdoc comments to OpenAI function [spec](https://platform.openai.com/docs/api-reference/chat/create#chat/create-functions).
 
 ## Usage
+
+```bash
+npm install typescript2openai
+```
+
 ```typescript
 import { parseTypeScript } from "typescript2openai";
 parseTypeScript("function funcWithArrayAndOptionalParam(firstParam: string[], optional?: number) {}");
@@ -50,4 +55,5 @@ to
 See the unit test for examples of conversions and usage: [basic.test.ts](./src/test/basic.test.ts)
 
 See also:
+- https://www.npmjs.com/package/typescript2openai
 - https://github.dev/vega/ts-json-schema-generator/
